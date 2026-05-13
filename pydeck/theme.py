@@ -18,6 +18,7 @@ MIN_GRID_ROWS = 2
 MAX_GRID_ROWS = 5
 
 COMPACT_SIZE = 100
+COMPACT_EXTRA = 12
 
 
 def tile_size(window_width: int) -> int:

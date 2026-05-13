@@ -7,6 +7,7 @@ from . import ui
 from .config import ConfigManager
 from .models import Shortcut
 from .theme import (
+    COMPACT_EXTRA,
     COMPACT_SIZE,
     EDIT_FORM_HEIGHT,
     GRID_SPACING,
@@ -74,16 +75,16 @@ class PyDeckApp:
         self.compact_mode = True
         self._saved_bgcolor = p.bgcolor
         self._saved_window_bgcolor = p.window.bgcolor
-        self.main_col.controls.clear()
-        self.main_col.spacing = 0
+        p.controls.clear()
+        p.spacing = 0
         p.padding = 0
         p.window.bgcolor = "transparent"
         p.bgcolor = "transparent"
         p.window.frameless = True
         p.window.width = COMPACT_SIZE
-        p.window.height = COMPACT_SIZE
+        p.window.height = COMPACT_SIZE + COMPACT_EXTRA
         p.window.min_width = COMPACT_SIZE
-        p.window.min_height = COMPACT_SIZE
+        p.window.min_height = COMPACT_SIZE + COMPACT_EXTRA
         p.window.always_on_top = True
         p.window.resizable = False
         cfg = self.cm.config
@@ -92,7 +93,7 @@ class PyDeckApp:
             p.window.top = cfg.compact_y
         else:
             asyncio.create_task(p.window.center())
-        self.main_col.controls.append(
+        p.add(
             ui.build_compact_view(p, self._restore_from_compact, self._save_compact_pos)
         )
         p.update()
@@ -113,6 +114,7 @@ class PyDeckApp:
         self.cm.config.compact_y = int(p.window.top or 0)
         self.cm.save()
 
+        p.controls.clear()
         p.window.bgcolor = self._saved_window_bgcolor
         p.bgcolor = self._saved_bgcolor or P_BG
         self.main_col.spacing = 10
@@ -128,6 +130,7 @@ class PyDeckApp:
             "always_on_top", self.cm.config.always_on_top
         )
         p.window.resizable = False
+        p.add(self.main_col)
         self._build_ui()
 
     def _on_reset_config(self):
@@ -199,10 +202,9 @@ class PyDeckApp:
         if self.config_mode:
             grid.controls.append(ui.build_add_button(self._add_shortcut))
         self.main_col.controls.append(grid)
-        self.page.update()
 
+        self.page.window.resizable = True
         self.page.window.height = h
-        self.page.window.min_height = h
         self.page.update()
 
     def _on_card_click(self, shortcut: Shortcut):

@@ -10,3 +10,4 @@ wheels/
 .venv
 
 .errors_file/
+.ruff_cache/

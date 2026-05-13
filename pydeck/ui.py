@@ -253,30 +253,23 @@ _ICON_PATH = str(Path(__file__).resolve().parent.parent / "assets" / "pydeck_ico
 
 def build_compact_view(
     page: ft.Page, on_restore, on_drag_end=None
-) -> ft.GestureDetector:
-    async def on_pan_start(e):
-        await page.window.start_dragging()
-
-    async def on_pan_end(e):
-        if on_drag_end:
-            on_drag_end()
-
-    return ft.GestureDetector(
+) -> ft.WindowDragArea:
+    return ft.WindowDragArea(
         content=ft.Container(
             content=ft.Image(
                 src=_ICON_PATH,
+                fit="fill",
+                gapless_playback=True,
                 width=COMPACT_SIZE,
                 height=COMPACT_SIZE,
-                fit=ft.BoxFit.CONTAIN,
-                gapless_playback=True,
             ),
             width=COMPACT_SIZE,
             height=COMPACT_SIZE,
+            on_click=lambda _: on_restore(),
         ),
-        mouse_cursor=ft.MouseCursor.MOVE,
-        on_pan_start=on_pan_start,
-        on_pan_end=on_pan_end,
-        on_tap=lambda _: on_restore(),
+        width=COMPACT_SIZE,
+        height=COMPACT_SIZE,
+        on_drag_end=lambda _: on_drag_end() if on_drag_end else None,
     )
 
 
