@@ -17,4 +17,17 @@ requires = ["setuptools>=75.0"]
 build-backend = "setuptools.build_meta"
 
 [tool.poe.tasks]
-play = "uv run main.py"
+app = "uv run pydeck"
+dev = "uv run flet run main.py"
+lint = "uv run ruff check ."
+format = "uv run ruff format ."
+check = "uv run ruff check . && uv run ruff format --check ."
+clean = "uv run python -c \"import shutil, pathlib; [shutil.rmtree(p) for p in pathlib.Path().iterdir() if p.name in ('build','dist','.ruff_cache') or p.suffix=='.egg-info']; [shutil.rmtree(p) for p in pathlib.Path().rglob('__pycache__')]; print('done')\""
+sync = "uv sync"
+build = "uv build"
+
+[tool.ruff]
+line-length = 88
+
+[tool.ruff.format]
+quote-style = "double"
