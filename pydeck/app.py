@@ -5,6 +5,7 @@ import flet as ft
 from . import actions, ui
 from .config import ConfigManager
 from .models import Shortcut
+from .os_utils import is_windows
 from .theme import (
     COMPACT_EXTRA,
     COMPACT_SIZE,
@@ -52,14 +53,24 @@ class PyDeckApp:
     def _on_keyboard(self, e: ft.KeyboardEvent):
         if e.ctrl and e.shift and e.key == "C":
             self._toggle_compact_mode()
-        elif e.ctrl and e.key == "E":
+            return
+        if e.ctrl and e.key == "E":
             self._toggle_config_mode()
 
     def _toggle_config_mode(self):
         self.config_mode = not self.config_mode
         self._build_ui()
 
+    def _unsupported_compact(self):
+        self.page.overlay.append(
+            ui.build_snackbar(self.page, "Modo compacto disponível apenas no Windows")
+        )
+        self.page.update()
+
     def _toggle_compact_mode(self):
+        if not is_windows():
+            self._unsupported_compact()
+            return
         if self.compact_mode:
             return
         p = self.page
@@ -76,15 +87,21 @@ class PyDeckApp:
         p.controls.clear()
         p.spacing = 0
         p.padding = 0
-        p.window.bgcolor = "transparent"
-        p.bgcolor = "transparent"
         p.window.frameless = True
-        p.window.width = COMPACT_SIZE
-        p.window.height = COMPACT_SIZE + COMPACT_EXTRA
-        p.window.min_width = COMPACT_SIZE
-        p.window.min_height = COMPACT_SIZE + COMPACT_EXTRA
+        p.window.title_bar_hidden = True
         p.window.always_on_top = True
         p.window.resizable = False
+        p.window.width = COMPACT_SIZE
+        if is_windows():
+            p.window.bgcolor = "transparent"
+            p.bgcolor = "transparent"
+            p.window.height = COMPACT_SIZE + COMPACT_EXTRA
+            p.window.min_width = COMPACT_SIZE
+            p.window.min_height = COMPACT_SIZE + COMPACT_EXTRA
+        else:
+            p.window.bgcolor = P_BG
+            p.bgcolor = P_BG
+            p.window.height = COMPACT_SIZE
         cfg = self.cm.config
         if cfg.compact_x is not None and cfg.compact_y is not None:
             p.window.left = cfg.compact_x
@@ -118,6 +135,9 @@ class PyDeckApp:
         self.main_col.spacing = 10
         p.padding = 12
         p.window.frameless = False
+        p.window.title_bar_hidden = False
+        p.window.max_width = None
+        p.window.max_height = None
         p.window.left = self._saved_window.get("left")
         p.window.top = self._saved_window.get("top")
         p.window.width = self._saved_window.get("width", WINDOW_WIDTH)
@@ -261,4 +281,4 @@ class PyDeckApp:
 
 
 def main():
-    ft.app(target=PyDeckApp)
+    ft.run(PyDeckApp)

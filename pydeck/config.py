@@ -2,6 +2,7 @@ import json
 import os
 
 from .models import Config, Shortcut
+from .os_utils import is_windows
 
 
 def _config_dir() -> str:
@@ -14,9 +15,9 @@ def _config_dir() -> str:
     return path
 
 
-def _defaults() -> Config:
-    return Config(
-        shortcuts=[
+def _default_shortcuts() -> list[Shortcut]:
+    if is_windows():
+        return [
             Shortcut(
                 title="Bloco de Notas",
                 icon="📝",
@@ -46,7 +47,40 @@ def _defaults() -> Config:
                 color="#9C27B0",
             ),
         ]
-    )
+    return [
+        Shortcut(
+            title="Navegador",
+            icon="🌐",
+            action_type="command",
+            action_value="xdg-open https://google.com",
+            color="#4CAF50",
+        ),
+        Shortcut(
+            title="Terminal",
+            icon="💻",
+            action_type="command",
+            action_value="gnome-terminal",
+            color="#2196F3",
+        ),
+        Shortcut(
+            title="Calculadora",
+            icon="🧮",
+            action_type="command",
+            action_value="gnome-calculator",
+            color="#FF9800",
+        ),
+        Shortcut(
+            title="Google",
+            icon="🌐",
+            action_type="url",
+            action_value="https://google.com",
+            color="#9C27B0",
+        ),
+    ]
+
+
+def _defaults() -> Config:
+    return Config(shortcuts=_default_shortcuts())
 
 
 class ConfigManager:

@@ -1,6 +1,8 @@
+<!-- markdownlint-disable MD033 MD060 MD040 -->
+
 # PyDeck
 
-Um lançador de atalhos inspirado no Stream Deck para Windows, construído com Python e **Flet 0.85.0**. Gerencie comandos, programas, arquivos e URLs em uma grade visual com tema escuro estilo Dracula.
+Um lançador de atalhos inspirado no Stream Deck para **Windows e Linux**, construído com Python e **Flet 0.85.0**. Gerencie comandos, programas, arquivos e URLs em uma grade visual com tema escuro estilo Dracula.
 
 <div align="center"><img src="assets/pydeck_icon.png" width="100" height="100" alt="PyDeck"></div>
 
@@ -9,40 +11,42 @@ Um lançador de atalhos inspirado no Stream Deck para Windows, construído com P
 ### Grade de Atalhos
 
 - Exibe até **20 atalhos** (5 linhas × 4 colunas) em cards com ícone emoji e título
-- Cores personalizáveis por atalho
+- Cores personalizáveis por atalho com preview visual e paleta de cores
 - Clique para executar a ação associada
 - Rolagem automática quando necessário
 
 ### Modo de Edição (Ctrl+E)
 
 - Adicionar novos atalhos com título, ícone emoji, cor e ação
+- **Seletor de cor**: preview visual ao lado do campo hex + botão de paleta com 20 cores predefinidas
 - Editar ou excluir atalhos existentes
 - Botão de editar e deletar sobrepostos em cada card
 - Botão de reset para restaurar configurações padrão
 
-### Modo Compacto (Ctrl+Shift+C)
+### Modo Compacto (Ctrl+Shift+C) — Windows
 
 - Ícone flutuante de 100×100 que fica sobre as janelas
 - **Arrastável**: clique e arraste para reposicionar na tela
 - Posição salva automaticamente ao arrastar
 - Fundo transparente com moldura removida
 - Toque no ícone para restaurar a janela completa
+- **Disponível apenas no Windows** (limitação do Flet no Linux)
 
 ### Tipos de Ação
 
-| Tipo | Descrição | Exemplo |
-|------|-----------|---------|
-| `Comando` | Executa um comando no shell | `shutdown /s /t 0` |
-| `Programa` | Abre um aplicativo | `notepad.exe`, `calc.exe` |
-| `Arquivo` | Abre um arquivo ou pasta | `C:\documento.pdf` |
-| `URL` | Abre no navegador padrão | `https://google.com` |
+| Tipo | Windows | Linux |
+|------|---------|-------|
+| `Comando` | `shutdown /s` | `gnome-terminal` |
+| `Programa` | `notepad.exe`, `calc.exe` | Usa `xdg-open` |
+| `Arquivo` | `C:\documento.pdf` | Usa `xdg-open` |
+| `URL` | Navegador padrão | Usa `xdg-open` |
 
 ### Atalhos de Teclado
 
 | Tecla | Ação |
 |-------|------|
 | `Ctrl + E` | Alterna modo de edição |
-| `Ctrl + Shift + C` | Alterna modo compacto flutuante |
+| `Ctrl + Shift + C` | Alterna modo compacto (apenas Windows) |
 
 ## Tecnologias
 
@@ -50,7 +54,6 @@ Um lançador de atalhos inspirado no Stream Deck para Windows, construído com P
 |------------|--------|------------|
 | Python | ≥ 3.12 | Linguagem principal |
 | **Flet** | 0.85.0 | Framework GUI (Flutter-based) |
-| setuptools | ≥ 75.0 | Build system |
 | **uv** | — | Gerenciamento de dependências e execução |
 
 ### Estrutura do Projeto
@@ -64,7 +67,8 @@ pydeck/
 │   ├── ui.py            # Componentes de interface
 │   ├── config.py        # Gerenciamento de configuração (JSON)
 │   ├── models.py        # Modelos de dados (Shortcut, Config)
-│   ├── actions.py       # Execução de ações (subprocess, startfile, webbrowser)
+│   ├── actions.py       # Execução de ações
+│   ├── os_utils.py       # Utilitários de detecção de SO
 │   └── theme.py         # Tema, cores e constantes de layout
 ├── assets/
 │   └── pydeck_icon.png  # Ícone do aplicativo
@@ -80,6 +84,11 @@ As configurações e atalhos são salvos em formato JSON em:
 - **Windows**: `%APPDATA%\pydeck\config.json`
 - **Linux**: `~/.config/pydeck/config.json`
 
+Na primeira execução, os atalhos padrão são adaptados ao SO:
+
+- **Windows**: Bloco de Notas, Calculadora, Terminal (cmd.exe), Google
+- **Linux**: Navegador, Terminal (gnome-terminal), Calculadora (gnome-calculator), Google
+
 ## Como Rodar
 
 ```bash
@@ -91,15 +100,6 @@ Ou, para desenvolvimento com recarregamento automático:
 ```bash
 uv run flet run main.py
 ```
-
-### Atalhos Padrão
-
-Ao iniciar pela primeira vez, o PyDeck cria automaticamente 4 atalhos de exemplo:
-
-- **Bloco de Notas** — `notepad.exe`
-- **Calculadora** — `calc.exe`
-- **Terminal** — `cmd.exe`
-- **Google** — `https://google.com`
 
 ## Desenvolvimento
 

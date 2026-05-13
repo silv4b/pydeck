@@ -6,21 +6,19 @@ readme = "README.md"
 requires-python = ">=3.12"
 dependencies = ["flet>=0.25.0"]
 
-[dependency-groups]
-dev = ["poethepoet>=0.44.0"]
-
 [project.scripts]
 pydeck = "pydeck.app:main"
+
+[dependency-groups]
+dev = ["poethepoet>=0.44.0", "ruff>=0.15.12"]
 
 [tool.poe.tasks]
 app = "uv run pydeck"
 dev = "uv run flet run main.py"
 lint = "uv run ruff check ."
 format = "uv run ruff format ."
-check = "uv run ruff check . && uv run ruff format --check ."
 clean = "uv run python -c \"import shutil, pathlib; [shutil.rmtree(p) for p in pathlib.Path().iterdir() if p.name in ('build','dist','.ruff_cache') or p.suffix=='.egg-info']; [shutil.rmtree(p) for p in pathlib.Path().rglob('__pycache__')]; print('done')\""
 sync = "uv sync"
-build = "uv build"
 
 [tool.ruff]
 line-length = 88

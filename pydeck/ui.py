@@ -4,26 +4,56 @@ from pathlib import Path
 import flet as ft
 
 from .models import Shortcut
+from .os_utils import is_windows, picker_extensions
 from .theme import (
     COMPACT_SIZE,
     P_ACCENT,
+    P_BG,
     P_LIGHT,
     P_PRIMARY,
     P_SURFACE,
 )
 
+COLOR_PALETTE = [
+    "#F44336",
+    "#E91E63",
+    "#9C27B0",
+    "#673AB7",
+    "#3F51B5",
+    "#2196F3",
+    "#03A9F4",
+    "#00BCD4",
+    "#009688",
+    "#4CAF50",
+    "#8BC34A",
+    "#CDDC39",
+    "#FFEB3B",
+    "#FFC107",
+    "#FF9800",
+    "#FF5722",
+    "#795548",
+    "#607D8B",
+    "#BD93F9",
+    "#FF79C6",
+]
+
 
 def build_top_bar(config_mode: bool, on_toggle, on_compact, on_reset) -> ft.Row:
-    return ft.Row(
-        [
-            ft.Text("PyDeck", size=18, weight=ft.FontWeight.BOLD, color=P_LIGHT),
-            ft.Container(expand=True),
+    controls = [
+        ft.Text("PyDeck", size=18, weight=ft.FontWeight.BOLD, color=P_LIGHT),
+        ft.Container(expand=True),
+    ]
+    if is_windows():
+        controls.append(
             ft.IconButton(
                 icon=ft.Icons.CIRCLE_OUTLINED,
                 icon_color=P_LIGHT,
                 tooltip="Modo Compacto (Ctrl+Shift+C)",
                 on_click=lambda _: on_compact(),
-            ),
+            )
+        )
+    controls.extend(
+        [
             ft.IconButton(
                 icon=ft.Icons.CHECK_ROUNDED if config_mode else ft.Icons.EDIT_ROUNDED,
                 icon_color=P_LIGHT,
@@ -38,6 +68,7 @@ def build_top_bar(config_mode: bool, on_toggle, on_compact, on_reset) -> ft.Row:
             ),
         ]
     )
+    return ft.Row(controls)
 
 
 def build_card(
@@ -158,8 +189,74 @@ def build_edit_form(
         ),
     )
     value_row = ft.Row([value_tf, browse_btn], spacing=4, tight=True)
+
+    color_preview = ft.Container(
+        width=36,
+        height=36,
+        border_radius=8,
+        bgcolor=shortcut.color or "#1E88E5",
+    )
+
+    def _on_color_change(e):
+        color_preview.bgcolor = e.control.value or "#1E88E5"
+        page.update()
+
     color_tf = ft.TextField(
-        label="Cor (hex)", value=shortcut.color, hint_text="#1E88E5"
+        label="Cor (hex)",
+        value=shortcut.color,
+        hint_text="#1E88E5",
+        on_change=_on_color_change,
+    )
+
+    def _show_palette(e):
+        def pick(color):
+            color_tf.value = color
+            color_preview.bgcolor = color
+            dialog.open = False
+            page.update()
+
+        chips = []
+        for c in COLOR_PALETTE:
+            chips.append(
+                ft.Container(
+                    width=36,
+                    height=36,
+                    border_radius=8,
+                    bgcolor=c,
+                    on_click=lambda _, col=c: pick(col),
+                )
+            )
+        rows_list = []
+        for i in range(0, len(chips), 5):
+            rows_list.append(
+                ft.Row(
+                    chips[i : i + 5], spacing=8, alignment=ft.MainAxisAlignment.CENTER
+                )
+            )
+
+        dialog = ft.AlertDialog(
+            title=ft.Text("Selecionar Cor", color=P_PRIMARY),
+            bgcolor=P_BG,
+            content=ft.Column(rows_list, spacing=8, tight=True),
+            actions=[
+                ft.TextButton(
+                    "Fechar",
+                    on_click=lambda _: setattr(dialog, "open", False) or page.update(),
+                ),
+            ],
+        )
+        page.show_dialog(dialog)
+
+    palette_btn = ft.IconButton(
+        icon=ft.Icons.PALETTE_OUTLINED,
+        icon_color=P_ACCENT,
+        tooltip="Paleta de cores",
+        on_click=_show_palette,
+    )
+    color_row = ft.Row(
+        [color_tf, color_preview, palette_btn],
+        spacing=8,
+        vertical_alignment=ft.CrossAxisAlignment.CENTER,
     )
 
     def save(_):
@@ -197,7 +294,7 @@ def build_edit_form(
             icon_tf,
             type_dd,
             value_row,
-            color_tf,
+            color_row,
             ft.Container(expand=True),
             ft.Row(
                 [
@@ -281,9 +378,7 @@ async def pick_file(
 ) -> None:
     if type_dd.value not in ("program", "file"):
         return
-    allowed = (
-        ["exe", "bat", "cmd", "com", "lnk"] if type_dd.value == "program" else None
-    )
+    allowed = picker_extensions(type_dd.value)
     files = await file_picker.pick_files(
         dialog_title="Selecione o arquivo",
         allowed_extensions=allowed,
