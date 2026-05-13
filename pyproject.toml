@@ -12,10 +12,6 @@ dev = ["poethepoet>=0.44.0"]
 [project.scripts]
 pydeck = "pydeck.app:main"
 
-[build-system]
-requires = ["setuptools>=75.0"]
-build-backend = "setuptools.build_meta"
-
 [tool.poe.tasks]
 app = "uv run pydeck"
 dev = "uv run flet run main.py"

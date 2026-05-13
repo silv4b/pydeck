@@ -11,3 +11,4 @@ wheels/
 
 .errors_file/
 .ruff_cache/
+.opencode/

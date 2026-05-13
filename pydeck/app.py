@@ -2,8 +2,7 @@ import asyncio
 
 import flet as ft
 
-from . import actions
-from . import ui
+from . import actions, ui
 from .config import ConfigManager
 from .models import Shortcut
 from .theme import (
@@ -11,7 +10,6 @@ from .theme import (
     COMPACT_SIZE,
     EDIT_FORM_HEIGHT,
     GRID_SPACING,
-    OVERHEAD_HEIGHT,
     P_BG,
     WINDOW_HEIGHT,
     WINDOW_WIDTH,
