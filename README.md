@@ -2,9 +2,7 @@
 
 Um lançador de atalhos inspirado no Stream Deck para Windows, construído com Python e **Flet 0.85.0**. Gerencie comandos, programas, arquivos e URLs em uma grade visual com tema escuro estilo Dracula.
 
-![PyDeck](assets/pydeck_icon.png)
-
----
+<div align="center"><img src="assets/pydeck_icon.png" width="100" height="100" alt="PyDeck"></div>
 
 ## Funcionalidades
 
@@ -46,8 +44,6 @@ Um lançador de atalhos inspirado no Stream Deck para Windows, construído com P
 | `Ctrl + E` | Alterna modo de edição |
 | `Ctrl + Shift + C` | Alterna modo compacto flutuante |
 
----
-
 ## Tecnologias
 
 | Tecnologia | Versão | Finalidade |
@@ -84,8 +80,6 @@ As configurações e atalhos são salvos em formato JSON em:
 - **Windows**: `%APPDATA%\pydeck\config.json`
 - **Linux**: `~/.config/pydeck/config.json`
 
----
-
 ## Como Rodar
 
 ```bash
@@ -107,8 +101,6 @@ Ao iniciar pela primeira vez, o PyDeck cria automaticamente 4 atalhos de exemplo
 - **Terminal** — `cmd.exe`
 - **Google** — `https://google.com`
 
----
-
 ## Desenvolvimento
 
 ```bash
@@ -125,8 +117,6 @@ uv run python main.py
 # Ou com recarregamento automático do Flet
 uv run flet run main.py
 ```
-
----
 
 ## Licença
 
