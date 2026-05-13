@@ -68,6 +68,8 @@ class ConfigManager:
             grid_columns=data.get("grid_columns", 4),
             button_size=data.get("button_size", 100),
             always_on_top=data.get("always_on_top", True),
+            compact_x=data.get("compact_x"),
+            compact_y=data.get("compact_y"),
             shortcuts=[Shortcut(**s) for s in data.get("shortcuts", [])],
         )
 
@@ -78,6 +80,8 @@ class ConfigManager:
                     "grid_columns": self.config.grid_columns,
                     "button_size": self.config.button_size,
                     "always_on_top": self.config.always_on_top,
+                    "compact_x": self.config.compact_x,
+                    "compact_y": self.config.compact_y,
                     "shortcuts": [
                         {
                             "id": s.id,
@@ -108,4 +112,8 @@ class ConfigManager:
 
     def delete_shortcut(self, sid: str) -> None:
         self.config.shortcuts = [s for s in self.config.shortcuts if s.id != sid]
+        self.save()
+
+    def reset_to_defaults(self) -> None:
+        self.config = _defaults()
         self.save()

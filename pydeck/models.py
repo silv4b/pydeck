@@ -17,4 +17,6 @@ class Config:
     grid_columns: int = 4
     button_size: int = 100
     always_on_top: bool = True
+    compact_x: int | None = None
+    compact_y: int | None = None
     shortcuts: list = field(default_factory=list)

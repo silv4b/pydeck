@@ -1,9 +1,11 @@
 import asyncio
+from pathlib import Path
 
 import flet as ft
 
 from .models import Shortcut
 from .theme import (
+    COMPACT_SIZE,
     P_ACCENT,
     P_LIGHT,
     P_PRIMARY,
@@ -11,16 +13,28 @@ from .theme import (
 )
 
 
-def build_top_bar(config_mode: bool, on_toggle) -> ft.Row:
+def build_top_bar(config_mode: bool, on_toggle, on_compact, on_reset) -> ft.Row:
     return ft.Row(
         [
             ft.Text("PyDeck", size=18, weight=ft.FontWeight.BOLD, color=P_LIGHT),
             ft.Container(expand=True),
             ft.IconButton(
+                icon=ft.Icons.CIRCLE_OUTLINED,
+                icon_color=P_LIGHT,
+                tooltip="Modo Compacto (Ctrl+Shift+C)",
+                on_click=lambda _: on_compact(),
+            ),
+            ft.IconButton(
                 icon=ft.Icons.CHECK_ROUNDED if config_mode else ft.Icons.EDIT_ROUNDED,
                 icon_color=P_LIGHT,
                 tooltip="Config (Ctrl+E)",
                 on_click=lambda _: on_toggle(),
+            ),
+            ft.IconButton(
+                icon=ft.Icons.DELETE_SWEEP,
+                icon_color=ft.Colors.RED_400,
+                tooltip="Resetar configurações",
+                on_click=lambda _: on_reset(),
             ),
         ]
     )
@@ -232,6 +246,38 @@ def build_snackbar(page: ft.Page, message: str) -> ft.SnackBar:
     )
     snack.on_dismiss = lambda _: page.overlay.remove(snack)
     return snack
+
+
+_ICON_PATH = str(Path(__file__).resolve().parent.parent / "assets" / "pydeck_icon.png")
+
+
+def build_compact_view(
+    page: ft.Page, on_restore, on_drag_end=None
+) -> ft.GestureDetector:
+    async def on_pan_start(e):
+        await page.window.start_dragging()
+
+    async def on_pan_end(e):
+        if on_drag_end:
+            on_drag_end()
+
+    return ft.GestureDetector(
+        content=ft.Container(
+            content=ft.Image(
+                src=_ICON_PATH,
+                width=COMPACT_SIZE,
+                height=COMPACT_SIZE,
+                fit=ft.BoxFit.CONTAIN,
+                gapless_playback=True,
+            ),
+            width=COMPACT_SIZE,
+            height=COMPACT_SIZE,
+        ),
+        mouse_cursor=ft.MouseCursor.MOVE,
+        on_pan_start=on_pan_start,
+        on_pan_end=on_pan_end,
+        on_tap=lambda _: on_restore(),
+    )
 
 
 async def pick_file(

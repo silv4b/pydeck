@@ -17,6 +17,8 @@ OVERHEAD_HEIGHT = 110
 MIN_GRID_ROWS = 2
 MAX_GRID_ROWS = 5
 
+COMPACT_SIZE = 100
+
 
 def tile_size(window_width: int) -> int:
     return (
